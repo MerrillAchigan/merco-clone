@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -11,10 +11,15 @@ const Style = () => {
   const styleTextRef = useRef();
   const wrapperRef = useRef();
   const videoRef = useRef();
-  const clippedRef = useRef();
+  const introRef = useRef();
 
-  const [isPlaying, setIsPlaying ] = useState(true);
-  
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.pause(); // pause on load
+    }
+  }, []);
 
   useGSAP(() => {
     const tl = gsap.timeline({
@@ -27,46 +32,39 @@ const Style = () => {
       },
     });
 
-    // Scale up the text and video together
-    tl.fromTo(
-      [styleTextRef.current, videoRef.current],
-      { scale: 1 , opacity: 1, y:0},
-      {
-        opacity: 0,
-        y:20,
-        scale: 6,
-        ease: 'power2.inOut',
-        transformOrigin: 'center',
-      },
-      0 // start at beginning of timeline
-    );
-    tl.fromTo(
-      [wrapperRef.current, videoRef.current],
-      {scale:1}, 
-      {
-        scale: 6,
-        transformOrigin: 'center',
-        ease: 'power2.inOut'
-      },
-      0
-    );
-    tl.fromTo(
-      [clippedRef.current, videoRef.current],
-      { scale: 2, opacity:0 },
-      {
-        opacity:1,
-        scale: 6,
-        ease: 'power2.inOut',
-        transformOrigin: 'center',
-      },
-      0 // or adjust timing if needed
-    );
-  }
-  , []);   
+    // Scale intro text
+    tl.to(introRef.current, {
+      scale: 2,
+      ease: 'power2.inOut',
+    });
 
-  const toggleVideo = () => {
-    if()
-  }
+    // Fade out and scale up "Style" text
+    tl.to(styleTextRef.current, {
+      scale: 6,
+      opacity: 0,
+      y: -40,
+      ease: 'power2.inOut',
+    }, '<'); // sync with previous
+
+    // Bring in the video full screen
+    tl.fromTo(
+      videoRef.current,
+      {
+        scale: 1.2,
+        opacity: 0,
+      },
+      {
+        scale: 1,
+        opacity: 1,
+        ease: 'power2.inOut',
+        onStart: () => {
+          videoRef.current.play();
+        },
+      },
+      '<+0.2' // slight delay for smoothness
+    );
+  }, []);
+
 
   return (
     <section
@@ -75,7 +73,8 @@ const Style = () => {
     >
       {/* Background outline text */}
       <h1
-        className="absolute text-[28vw]  text-transparent z-10 pointer-events-none"
+        ref={introRef}
+        className="absolute text-[28vw] text-transparent z-10 pointer-events-none"
         style={{
           WebkitTextStroke: '1px white',
         }}
@@ -83,45 +82,36 @@ const Style = () => {
         For your
       </h1>
 
-      {/* Main content with video masked by text */}
-            <div
-        ref={wrapperRef} // 👈 new wrapper
-        className="relative z-20 w-fit h-fit flex justify-center items-center">
-        {/* Text only shown for accessibility or fallback */}
+      {/* Style text and video */}
+      <div
+        ref={wrapperRef}
+        className="relative z-20 w-fit h-fit flex justify-center items-center"
+      >
         <div
           ref={styleTextRef}
           className="absolute text-[15vw] text-white leading-none pointer-events-none"
           style={{
-            color: 'white',
             WebkitTextStroke: '1px white',
           }}
         >
           Style
         </div>
 
-        {/* Video masked by text */}
-        <div
-          className="w-full h-full"
-          ref={clippedRef}
-          style={{
-            maskImage: 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><text x=\'50%\' y=\'50%\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-size=\'15vw\' font-weight=\'800\' font-family=\'Newsreader\'>Style</text></svg>")',
-            WebkitMaskImage: 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><text x=\'50%\' y=\'50%\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-size=\'15vw\' font-weight=\'800\' font-family=\'Newsreader\'>Style</text></svg>")',
-            WebkitMaskRepeat: 'no-repeat',
-            WebkitMaskSize: 'contain',
-            WebkitMaskPosition: 'center',
-          }}
-        >
-          <video
-            ref={videoRef}
-            src={faktur}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="w-full h-full object-cover"
-          />
-        </div>
+        {/* Fullscreen video appears */}
+        <video
+          ref={videoRef}
+          src={faktur}
+          muted
+          autoPlay
+          loop
+          playsInline
+          className="fixed top-0 left-0 w-full h-full object-cover z-40"
+        />
+
       </div>
+
+      {/*Now the cards */}
+      
     </section>
   );
 };

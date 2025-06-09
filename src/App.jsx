@@ -5,6 +5,7 @@ import './App.css'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import Style from './components/Style'
+import Cards from './components/Cards'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -14,6 +15,7 @@ function App() {
       <Navbar />
       <Hero />
       <Style />
+      <Cards />
     </>
   )
 }
