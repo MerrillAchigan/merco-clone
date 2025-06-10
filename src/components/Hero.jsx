@@ -100,7 +100,7 @@ const Hero = () => {
 
   return (
     <section ref={containerRef} className="mt-10 w-full h-[calc(100vh-60px)] relative flex justify-center items-center">
-      <div className="lg:w-11/12 sm:w-full sm:object-fill sm:h-100vh text-center relative"
+      <div className="lg:w-10/12 sm:w-full sm:object-fill sm:h-100vh text-center relative"
       onMouseEnter={() => setShowCursor(true)}
       onMouseLeave={() => setShowCursor(false)}
       onMouseMove={handleMouse}

@@ -22,7 +22,9 @@ const Cards = () => {
     }
   ];
   return (
-    <div>Cards</div>
+    <section>
+      
+    </section>
   )
 }
 
