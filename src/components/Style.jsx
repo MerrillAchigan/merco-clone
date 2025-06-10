@@ -37,7 +37,7 @@ const Style = () => {
     tl.fromTo(
       introRef.current,
       { scale: 1 },
-      { scale: 2, duration: 1, ease: 'power3.inOut' },
+      { scale: 2, opacity:0, duration: 1, ease: 'power3.inOut' },
       0
     );
 
@@ -45,7 +45,7 @@ const Style = () => {
     tl.fromTo(
       styleTextRef.current,
       {
-        y: 100,
+        y: 40,
         scale: 1,
       },
       {
@@ -119,7 +119,7 @@ const Style = () => {
   return (
     <section
       ref={containerRef}
-      className="relative h-full w-full bg-black overflow-hidden"
+      className="relative h-[100vh] w-full bg-black overflow-hidden"
     >
       <div className="sticky top-0 h-screen flex justify-center items-center">
         {/* Outline text */}
