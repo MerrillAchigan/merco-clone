@@ -19,22 +19,79 @@ const Cards = () => {
       {word}&nbsp;
     </span>
   ));
-
+  
   useGSAP(() => {
+    // Set initial states for all elements
     const words = firstTextRef.current.querySelectorAll('span');
-    gsap.to(words, {
+    gsap.set(words, { opacity: 0 });
+    gsap.set([firstCardRef.current, secondCardRef.current, thirdCardRef.current], {
+      opacity: 0,
+      y: 10,
+    });
+  
+    // Animation timeline that only plays forward
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: 'top center',
+        end: 'center center', // Adjust this based on when you want animation to complete
+        scrub: 1,
+        onComplete: () => {
+          // Ensure elements stay visible after animation completes
+          gsap.set([firstCardRef.current, secondCardRef.current, thirdCardRef.current], {
+            opacity: 1,
+            y: 0,
+          });
+          gsap.set(words, { opacity: 1 });
+        }
+      },
+    });
+  
+    // Only animate IN - no reverse animations
+    tl.to(words, {
       opacity: 1,
-      y: -10,
-      yoyo: true,
-      delay: 1,
-      duration: 0.5,
+      duration: 0.3,
       stagger: {
-        each: 0.2,
+        each: 0.04,
         ease: 'power2.inOut',
         from: 'start',
       },
+    }, 0)
+    .to(firstCardRef.current, {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      ease: 'power2.out'
+    }, 0.3)
+    .to(secondCardRef.current, {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      ease: 'power2.out'
+    }, 0.8)
+    .to(thirdCardRef.current, {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      ease: 'power2.out'
+    }, 1.3);
+  
+    // Separate trigger for when scrolling back up (reverse animation)
+    ScrollTrigger.create({
+      trigger: containerRef.current,
+      start: 'top bottom',
+      end: 'top center',
+      onEnterBack: () => {
+        // Reset to initial state when coming back from below
+        gsap.set([firstCardRef.current, secondCardRef.current, thirdCardRef.current], {
+          opacity: 0,
+          y: 10,
+        });
+        gsap.set(words, { opacity: 0 });
+      }
     });
-  });
+  
+  }, []);
 
   return (
     <section className='py-50 h-[100vh] max-w-[calc(100vw-40px)] flex flex-col relative'>
@@ -43,12 +100,12 @@ const Cards = () => {
           <div className='flex-col  ml-20 items-start'>
             <h2
               ref={firstTextRef}
-              className='text-4xl lg:text-7xl mt-20 absolute top-1/2 left-1/2 transform -translate-x-1/2  -translate-y-1/2'
+              className='text-4xl lg:text-7xl mt-20 w-[700px]'
             >
               {splitText}
             </h2>
-            <div ref={firstCardRef} className='mt-50 flex flex-col'>
-              <img src={style1} alt="" className='w-full' />
+            <div ref={secondCardRef} className='mt-50 flex flex-col'>
+              <img src={style1} alt="" className='w-full mt-20' />
               <h3 className='text-4xl lg:text-4xl py-5 mt-5'>Find your color.</h3>
               <p className='text-2xl mb-70 regular-text'>
                 MANUFAKTUR allows you to customize your car in the shade that reflects your personality. From Night Black Magno to Ireland Mid Green Metallic, each hue is carefully selected, ensuring your star shines even brighter.
@@ -56,10 +113,10 @@ const Cards = () => {
             </div>
           </div>
           <div className='flex flex-col mr-10 items-start'>
-            <div ref={secondCardRef} className='ml-50'>
+            <div ref={firstCardRef} className='ml-50'>
               <img src={merco} alt="" className='w-[40vw]' />
               <h3 className='text-4xl lg:text-4xl py-5 mt-5'>Mercedes‑Benz but your way.</h3>
-              <p className='text-2xl mb-100 regular-text'>
+              <p className='text-2xl mb-110 regular-text'>
                 For over 120 years, Mercedes‑Benz has been tailoring vehicles to individual desires. As the automobile has evolved, so has the art of customization. At MANUFAKTUR, you can choose from exclusive colors, elegant upholsteries, and refined trims – creating a car that reflects who you are.
               </p>
             </div>
